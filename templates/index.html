@@ -1,0 +1,27 @@
+<html>
+  <head>
+    <title>you're late</title>
+  </head>
+  <body>
+    <button>create group</button>
+    {% if not groups %}
+      <p>:( you don't have any group</p>
+    {% else %}
+      {% for group in groups %}
+        <div>
+          <h3>{{ group["name"] }}</h3>
+          {% for member in group["members"] %}
+            <p>{{ member }}</p>
+            <ul>
+              {% for date in group["members"][member] %}
+                <li>
+                  <p>Date: {{ group["members"][member]["date"] }} Late: {{ group["members"][member]["late"] }}</p>
+                </li>
+              {% endfor %} 
+            </ul>
+          {% endfor %}
+        </div>
+      {% endfor %}
+    {% endif %}
+  </body>
+</html>
