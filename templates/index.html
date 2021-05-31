@@ -1,27 +1,108 @@
 <html>
   <head>
     <title>you're late</title>
+    <meta charset="UTF-8">
+    <meta name="description" content="your friends won't get late again">
+    <meta name="keywords" content="ur late, you are late, you're late, late">
+    <meta name="author" content="ssebastianoo">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
   </head>
   <body>
-    <button>create group</button>
-    {% if not groups %}
-      <p>:( you don't have any group</p>
-    {% else %}
-      {% for group in groups %}
-        <div>
-          <h3>{{ group["name"] }}</h3>
-          {% for member in group["members"] %}
-            <p>{{ member }}</p>
-            <ul>
-              {% for date in group["members"][member] %}
-                <li>
-                  <p>Date: {{ group["members"][member]["date"] }} Late: {{ group["members"][member]["late"] }}</p>
-                </li>
-              {% endfor %} 
-            </ul>
-          {% endfor %}
-        </div>
-      {% endfor %}
-    {% endif %}
+      <div>
+        <input id="group_name" type="text" name="name" placeholder="group name">
+      </div>
+      <button onclick="createGroup()">create group</button>
+      <div id="groups">
+      {% if not groups %}
+        <p>:( you don't have any group</p>
+      {% else %}
+        {% for group in groups %}
+          <div>
+            <h3>{{ groups[group]["name"] }}</h3>
+            {% for member in groups[group]["members"] %}
+              <p>{{ member }}</p>
+              <ul>
+                {% for date in groups[group]["members"][member] %}
+                  <li>
+                    <p>Date: {{ date["date"] }} Late: {{ date["late"] }}</p>
+                  </li>
+                {% endfor %} 
+              </ul>
+              <div>
+                <input id="{{group}}_{{member}}_date" type="text" placeholder="date" name="date">
+                <input id="{{group}}_{{member}}_late" placeholder="late" name="late">
+                <button onclick="addLate('{{ group }}', '{{ member }}')">add late</button>
+              </div>
+            {% endfor %}
+          </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+    <script type="text/javascript">
+
+      async function addLate(group_id, member) {
+        late = document.getElementById(`${group_id}_${member}_late`).value;
+        date = document.getElementById(`${group_id}_${member}_date`).value;
+        await fetch('/api/v1/late/', {
+          headers: {'Content-Type': 'application/json'},
+          method: 'POST',
+          body: JSON.stringify({"group_id": group_id, "member": member, "date": date, "late": late})
+        });
+        await displayGroups(); 
+      };
+
+      async function createGroup() {
+        var group_name_input = document.getElementById("group_name");
+        if (!group_name_input.value) {
+          return;
+        } else {
+          group_name = group_name_input.value;
+        };
+        await fetch('/api/v1/create/', {
+          headers: {'Content-Type': 'application/json'},
+          method: 'POST',
+          body: JSON.stringify({"name": group_name})
+        });
+        await displayGroups(); 
+      }
+
+      async function displayGroups() {
+        var groups = document.getElementById("groups");
+        res = await fetch('/api/v1/groups/', {
+          method: 'GET',
+        });
+        data = await res.json();
+        groups.innerHTML = "";
+        if (!groups) {
+          groups.innerHTML = "<p>:( you don't have any group</p>"
+        } else {
+          for (let group in data) {
+            var div = document.createElement("div");
+            var groupName = document.createElement("h3");
+            groupName.innerText = data[group]["name"];
+            div.appendChild(groupName);
+
+            for (let member in data[group]["members"]) {
+              var member_name = document.createElement("p")
+              member_name.innerText = member;
+              div.appendChild(member_name);
+              await console.log("1")
+              var ul = document.createElement("ul");
+              for (i=0; i < data[group]["members"][member].length; i++) {
+                await console.log("2")
+                var li = document.createElement("li");
+                li.innerHTML = `<p>Date: ${data[group]['members'][member][i]['date']} Late: ${data[group]['members'][member][i]['late']}</p>`;
+                ul.appendChild(li);
+              };
+              div.appendChild(ul);
+              inputs = document.createElement("div");
+              inputs.innerHTML = `<input id="${group}_${member}_date" type="text" placeholder="date" name="date">\n<input id="${group}_${member}_late" type="text" placeholder="date" name="late">\n<button onclick="addLate('${group}', '${member}')">add late</button>`
+              div.appendChild(inputs);
+            }
+            groups.appendChild(div)
+          }
+        }
+      }
+    </script>
   </body>
 </html>
