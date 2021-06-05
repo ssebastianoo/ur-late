@@ -1,6 +1,6 @@
 <html>
   <head>
-    <title>you're late</title>
+    <title>ur late</title>
     <meta charset="UTF-8">
     <meta name="description" content="your friends won't get late again">
     <meta name="keywords" content="ur late, you are late, you're late, late">
@@ -9,9 +9,9 @@
   </head>
   <body>
       <div>
-        <input id="group_name" type="text" name="name" placeholder="group name">
+        <input id="group_name" type="text" name="name" placeholder="group name" autocomplete="off">
+        <button type="submit" onclick="createGroup()">create group</button>
       </div>
-      <button onclick="createGroup()">create group</button>
       <div id="groups">
       {% if not groups %}
         <p>:( you don't have any group</p>
@@ -19,90 +19,32 @@
         {% for group in groups %}
           <div>
             <h3>{{ groups[group]["name"] }}</h3>
+            <button type="submit" onclick="deleteGroup('{{group}}')">delete</button>
             {% for member in groups[group]["members"] %}
               <p>{{ member }}</p>
+              <button type="submit" onclick="deleteMember('{{group}}', '{{member}}')">delete</button>
               <ul>
                 {% for date in groups[group]["members"][member] %}
                   <li>
-                    <p>Date: {{ date["date"] }} Late: {{ date["late"] }}</p>
+                    <p>Date: {{ groups[group]["members"][member][date]["date"] }} Late: {{ groups[group]["members"][member][date]["late"] }}</p>
+                    <button type="submit" onclick="deleteLate('{{group}}', '{{member}}', '{{date}}')">delete</button>
                   </li>
                 {% endfor %} 
               </ul>
               <div>
-                <input id="{{group}}_{{member}}_date" type="text" placeholder="date" name="date">
-                <input id="{{group}}_{{member}}_late" placeholder="late" name="late">
-                <button onclick="addLate('{{ group }}', '{{ member }}')">add late</button>
+                <input id="{{group}}_{{member}}_date" type="text" placeholder="date" name="date" autocomplete="off">
+                <input id="{{group}}_{{member}}_late" placeholder="late" name="late" autocomplete="off">
+                <button type="submit" onclick="addLate('{{ group }}', '{{ member }}')">add late</button>
               </div>
             {% endfor %}
+            <div>
+              <input type="text" id="{{group}}_member" name="member" placeholder="member" autocomplete="off">
+              <button type="submit" onclick="addMember('{{group}}')">add member</button>
+            </div>
           </div>
         {% endfor %}
       {% endif %}
     </div>
-    <script type="text/javascript">
-
-      async function addLate(group_id, member) {
-        late = document.getElementById(`${group_id}_${member}_late`).value;
-        date = document.getElementById(`${group_id}_${member}_date`).value;
-        await fetch('/api/v1/late/', {
-          headers: {'Content-Type': 'application/json'},
-          method: 'POST',
-          body: JSON.stringify({"group_id": group_id, "member": member, "date": date, "late": late})
-        });
-        await displayGroups(); 
-      };
-
-      async function createGroup() {
-        var group_name_input = document.getElementById("group_name");
-        if (!group_name_input.value) {
-          return;
-        } else {
-          group_name = group_name_input.value;
-        };
-        await fetch('/api/v1/create/', {
-          headers: {'Content-Type': 'application/json'},
-          method: 'POST',
-          body: JSON.stringify({"name": group_name})
-        });
-        await displayGroups(); 
-      }
-
-      async function displayGroups() {
-        var groups = document.getElementById("groups");
-        res = await fetch('/api/v1/groups/', {
-          method: 'GET',
-        });
-        data = await res.json();
-        groups.innerHTML = "";
-        if (!groups) {
-          groups.innerHTML = "<p>:( you don't have any group</p>"
-        } else {
-          for (let group in data) {
-            var div = document.createElement("div");
-            var groupName = document.createElement("h3");
-            groupName.innerText = data[group]["name"];
-            div.appendChild(groupName);
-
-            for (let member in data[group]["members"]) {
-              var member_name = document.createElement("p")
-              member_name.innerText = member;
-              div.appendChild(member_name);
-              await console.log("1")
-              var ul = document.createElement("ul");
-              for (i=0; i < data[group]["members"][member].length; i++) {
-                await console.log("2")
-                var li = document.createElement("li");
-                li.innerHTML = `<p>Date: ${data[group]['members'][member][i]['date']} Late: ${data[group]['members'][member][i]['late']}</p>`;
-                ul.appendChild(li);
-              };
-              div.appendChild(ul);
-              inputs = document.createElement("div");
-              inputs.innerHTML = `<input id="${group}_${member}_date" type="text" placeholder="date" name="date">\n<input id="${group}_${member}_late" type="text" placeholder="date" name="late">\n<button onclick="addLate('${group}', '${member}')">add late</button>`
-              div.appendChild(inputs);
-            }
-            groups.appendChild(div)
-          }
-        }
-      }
-    </script>
+    <script type="text/javascript" src="{{url_for('static', filename='script.js')}}"></script>
   </body>
 </html>

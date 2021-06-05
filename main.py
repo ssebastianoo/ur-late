@@ -1,7 +1,10 @@
 import os, json, uuid
 from replit import db
-from flask import Flask, redirect, url_for, render_template, request, Response, jsonify
+from flask import Flask, redirect, url_for, render_template, request, Response
 from flask_discord import DiscordOAuth2Session, requires_authorization, Unauthorized
+
+if not db.get("groups"):
+  db["groups"] = dict()
 
 app = Flask(__name__)
 
@@ -36,27 +39,58 @@ def index():
         groups = None
     return render_template("index.html", groups=groups)
 
-@app.route("/api/v1/create/", methods=["POST"])
+@app.route("/api/v1/groups/create/", methods=["POST"])
 def create_group():
     "create a new group"
 
     u_id = uuid.uuid1().int
-
     user = discord.fetch_user()
     name = request.json["name"]
-    db["groups"][u_id] = {"name": name, "members": [], "access": [user.id]}
+    db["groups"][u_id] = {"name": name, "members": {}, "access": [user.id]}
     return Response(response="Ok", status=200)
 
-@app.route("/api/v1/late/", methods=["POST"])
+@app.route("/api/v1/groups/delete/", methods=["POST"])
+def delete_group():
+    "delete a group"
+
+    group_id = request.json["group_id"]
+    del db["groups"][group_id]
+    return Response(response="Ok", status=200)
+
+@app.route("/api/v1/lates/create/", methods=["POST"])
 def add_late():
     "add a late to a member"
-
+  
     data = request.json
-    print(data)
-    db["groups"][data["group_id"]]["members"][data["member"]].append({"date": data["date"], "late": data["late"]})
+    db["groups"][data["group_id"]]["members"][data["member"]][uuid.uuid1().int] = {"date": data["date"], "late": data["late"]}
     return Response(response="Ok", status=200)
 
-@app.route("/api/v1/groups/", methods=["GET"])
+@app.route("/api/v1/lates/delete/", methods=["POST"])
+def remove_late():
+    "remove a late to a member"
+  
+    data = request.json
+    del db["groups"][data["group_id"]]["members"][data["member"]][data["late"]]
+
+    return Response(response="Ok", status=200)
+
+@app.route("/api/v1/members/create/", methods=["POST"])
+def add_member():
+    "add a member to a group"
+
+    data = request.json
+    db["groups"][data["group_id"]]["members"][data["member"]] = {}
+    return Response(response="Ok", status=200)
+
+@app.route("/api/v1/members/delete/", methods=["POST"])
+def delete_member():
+    "delete a member from a group"
+
+    data = request.json
+    del db["groups"][data["group_id"]]["members"][data["member"]]
+    return Response(response="Ok", status=200)
+
+@app.route("/api/v1/groups/display/", methods=["GET"])
 def groups():
     "Get a user's groups"
     user = discord.fetch_user()
@@ -67,13 +101,13 @@ def groups():
         for value in db["groups"][group]:
           if value == "members":
               g_[value] = dict()
-              for m in db["groups"][group][value]:
-                  g_[value][m] = list()
-                  for m_ in db["groups"][group][value][m]:
+              for member in db["groups"][group][value]:
+                  g_[value][member] = dict()
+                  for date_id in db["groups"][group][value][member]:
                     dates = dict()
-                    for x in m_:
-                      dates[x] = m_[x]
-                    g_[value][m].append(dates)
+                    for x in db["groups"][group][value][member][date_id]:
+                      dates[x] = db["groups"][group][value][member][date_id][x]
+                    g_[value][member][date_id] = dates
           elif value == "access":
                   g_[value] = list()
                   for access in db["groups"][group][value]:
@@ -90,9 +124,13 @@ def groups():
                           mimetype='application/json')
     return groups
 
+@app.route("/main")
+def main():
+  return render_template("main.html")
+
 @app.errorhandler(Unauthorized)
 def redirect_unauthorized(e):
-    return redirect(url_for("login"))
+    return render_template("main.html")
 
 @app.route("/me/")
 @requires_authorization
