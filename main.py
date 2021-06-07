@@ -45,50 +45,50 @@ def create_group():
 
     u_id = uuid.uuid1().int
     user = discord.fetch_user()
-    name = request.json["name"]
+    name = request.form["name"]
     db["groups"][u_id] = {"name": name, "members": {}, "access": [user.id]}
-    return Response(response="Ok", status=200)
+    return redirect(url_for("index"))
 
 @app.route("/api/v1/groups/delete/", methods=["POST"])
 def delete_group():
     "delete a group"
 
-    group_id = request.json["group_id"]
+    group_id = request.form["group_id"]
     del db["groups"][group_id]
-    return Response(response="Ok", status=200)
+    return redirect(url_for("index"))
 
 @app.route("/api/v1/lates/create/", methods=["POST"])
 def add_late():
     "add a late to a member"
   
-    data = request.json
+    data = request.form
     db["groups"][data["group_id"]]["members"][data["member"]][uuid.uuid1().int] = {"date": data["date"], "late": data["late"]}
-    return Response(response="Ok", status=200)
+    return redirect(url_for("index"))
 
 @app.route("/api/v1/lates/delete/", methods=["POST"])
 def remove_late():
     "remove a late to a member"
   
-    data = request.json
+    data = request.form
     del db["groups"][data["group_id"]]["members"][data["member"]][data["late"]]
 
-    return Response(response="Ok", status=200)
+    return redirect(url_for("index"))
 
 @app.route("/api/v1/members/create/", methods=["POST"])
 def add_member():
     "add a member to a group"
 
-    data = request.json
+    data = request.form
     db["groups"][data["group_id"]]["members"][data["member"]] = {}
-    return Response(response="Ok", status=200)
+    return redirect(url_for("index"))
 
 @app.route("/api/v1/members/delete/", methods=["POST"])
 def delete_member():
     "delete a member from a group"
 
-    data = request.json
+    data = request.form
     del db["groups"][data["group_id"]]["members"][data["member"]]
-    return Response(response="Ok", status=200)
+    return redirect(url_for("index"))
 
 @app.route("/api/v1/groups/display/", methods=["GET"])
 def groups():

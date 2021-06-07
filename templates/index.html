@@ -6,11 +6,14 @@
     <meta name="keywords" content="ur late, you are late, you're late, late">
     <meta name="author" content="ssebastianoo">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{url_for('static', filename='css/style.css')}}" type="text/css">
   </head>
   <body>
       <div>
-        <input id="group_name" type="text" name="name" placeholder="group name" autocomplete="off">
-        <button type="submit" onclick="createGroup()">create group</button>
+        <form method="post" action="/api/v1/groups/create/">
+          <input id="group_name" type="text" name="name" placeholder="group name" autocomplete="off">
+          <input type="submit" value="create group">
+        </form>
       </div>
       <div id="groups">
       {% if not groups %}
@@ -19,27 +22,48 @@
         {% for group in groups %}
           <div>
             <h3>{{ groups[group]["name"] }}</h3>
-            <button type="submit" onclick="deleteGroup('{{group}}')">delete</button>
+
+            <form method="post" action="/api/v1/groups/delete/">
+              <input class="hidden" name="group_id" type="number" value="{{group}}">
+              <input type="submit" value="delete">
+            </form>
             {% for member in groups[group]["members"] %}
               <p>{{ member }}</p>
-              <button type="submit" onclick="deleteMember('{{group}}', '{{member}}')">delete</button>
+              <form method="post" action="/api/v1/members/delete/">
+                <input class="hidden" name="group_id" type="number" value="{{group}}">
+                <input class="hidden" value="{{member}}" name="member" type="text">
+                <input type="submit", '{{member}}' value="delete">
+              </form>
               <ul>
                 {% for date in groups[group]["members"][member] %}
                   <li>
                     <p>Date: {{ groups[group]["members"][member][date]["date"] }} Late: {{ groups[group]["members"][member][date]["late"] }}</p>
-                    <button type="submit" onclick="deleteLate('{{group}}', '{{member}}', '{{date}}')">delete</button>
+
+                    <form method="post" action="/api/v1/lates/delete/">
+                      <input class="hidden" name="group_id" type="number" value="{{group}}">
+                      <input class="hidden" name="member" type="text" value="{{member}}">
+                      <input class="hidden" name="late" type="text" value="{{date}}">
+                      <input type="submit" value="delete">
+                   </form>
                   </li>
                 {% endfor %} 
               </ul>
               <div>
-                <input id="{{group}}_{{member}}_date" type="text" placeholder="date" name="date" autocomplete="off">
-                <input id="{{group}}_{{member}}_late" placeholder="late" name="late" autocomplete="off">
-                <button type="submit" onclick="addLate('{{ group }}', '{{ member }}')">add late</button>
+                <form action="/api/v1/lates/create/" method="post">
+                  <input class="hidden" name="group_id" type="number" value="{{group}}">
+                  <input class="hidden" name="member" type="text" value="{{member}}">
+                  <input type="text" placeholder="date" name="date" autocomplete="off">
+                  <input placeholder="late" name="late" autocomplete="off">
+                  <input type="submit" value="add late">
+                </form>
               </div>
             {% endfor %}
             <div>
-              <input type="text" id="{{group}}_member" name="member" placeholder="member" autocomplete="off">
-              <button type="submit" onclick="addMember('{{group}}')">add member</button>
+              <form method="post" action="/api/v1/members/create/">
+                <input class="hidden" name="group_id" type="number" value="{{group}}">
+                <input type="text" placeholder="member" autocomplete="off" name="member">
+                <input type="submit" value="add member">
+              </form>
             </div>
           </div>
         {% endfor %}
