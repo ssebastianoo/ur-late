@@ -17,13 +17,8 @@
       {% include 'header.html' %}
       <div>
         <form method="post" action="/api/v1/groups/create/">
-<<<<<<< HEAD
           <input class="input" id="group_name" type="text" name="name" placeholder="group name" autocomplete="off">
           <input class="submit" type="submit" value="create group">
-=======
-          <input id="group_name" type="text" name="name" placeholder="group name" autocomplete="off">
-          <input type="submit" value="create group">
->>>>>>> 1214d919b7f60ba3adf84e3639afa30bc33e17b6
         </form>
       </div>
       <div id="groups">
@@ -43,11 +38,7 @@
               <form method="post" action="/api/v1/members/delete/">
                 <input class="hidden" name="group_id" type="number" value="{{group}}">
                 <input class="hidden" value="{{member}}" name="member" type="text">
-<<<<<<< HEAD
                 <input class="submit" type="submit", '{{member}}' value="delete">
-=======
-                <input type="submit", '{{member}}' value="delete">
->>>>>>> 1214d919b7f60ba3adf84e3639afa30bc33e17b6
               </form>
               <ul>
                 {% for date in groups[group]["members"][member] %}
@@ -58,11 +49,7 @@
                       <input class="hidden" name="group_id" type="number" value="{{group}}">
                       <input class="hidden" name="member" type="text" value="{{member}}">
                       <input class="hidden" name="late" type="text" value="{{date}}">
-<<<<<<< HEAD
                       <input class="submit" type="submit" value="delete">
-=======
-                      <input type="submit" value="delete">
->>>>>>> 1214d919b7f60ba3adf84e3639afa30bc33e17b6
                    </form>
                   </li>
                 {% endfor %} 
@@ -71,28 +58,17 @@
                 <form action="/api/v1/lates/create/" method="post">
                   <input class="hidden" name="group_id" type="number" value="{{group}}">
                   <input class="hidden" name="member" type="text" value="{{member}}">
-<<<<<<< HEAD
                   <input class="input" type="date" placeholder="date" name="date" autocomplete="off">
                   <input class="input" placeholder="late" name="late" autocomplete="off">
                   <input class="submit" type="submit" value="add late">
-=======
-                  <input type="text" placeholder="date" name="date" autocomplete="off">
-                  <input placeholder="late" name="late" autocomplete="off">
-                  <input type="submit" value="add late">
->>>>>>> 1214d919b7f60ba3adf84e3639afa30bc33e17b6
                 </form>
               </div>
             {% endfor %}
             <div>
               <form method="post" action="/api/v1/members/create/">
                 <input class="hidden" name="group_id" type="number" value="{{group}}">
-<<<<<<< HEAD
                 <input class="input" type="text" placeholder="member" autocomplete="off" name="member">
                 <input class="submit" type="submit" value="add member">
-=======
-                <input type="text" placeholder="member" autocomplete="off" name="member">
-                <input type="submit" value="add member">
->>>>>>> 1214d919b7f60ba3adf84e3639afa30bc33e17b6
               </form>
             </div>
           </div>
