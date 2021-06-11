@@ -1,0 +1,11 @@
+body {
+  font-family: 'Ubuntu Mono', monospace;
+}
+
+.hidden {
+  display: none;
+}
+
+.header {
+  text-align: center;
+}
