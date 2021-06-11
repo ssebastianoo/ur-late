@@ -1,0 +1,81 @@
+body {
+  font-family: 'Ubuntu Mono', monospace;
+  background: #333030;
+  color: white;
+  overflow-x: hidden;
+}
+
+.container {
+  top: 50%;
+  width: 100%;
+  position: absolute;
+  transform: translateY(-55%);
+}
+
+.hidden {
+  display: none;
+}
+
+.header {
+  text-align: center;
+}
+
+.users {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.user {
+  background: black;
+  padding: 10px 10px;
+  margin: 20px;
+}
+
+.user h3 {
+  text-align: center;
+}
+
+.late-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.late {
+  background: #141414;
+  margin: 10px;
+  padding: 5px 5px;
+}
+
+.late-button {
+  text-align: center;
+}
+
+.button {
+  margin: 10px;
+  font-family: 'Ubuntu Mono', monospace;
+  background: #141414;
+  color: white;
+  border: none;
+  padding: 5px;
+  font-size: 120%;
+  width: 80%;
+}
+
+select.button {
+  margin: 10px;
+  font-family: 'Ubuntu Mono', monospace;
+  background: #141414;
+  color: white;
+  border: none;
+  padding: 5px;
+  font-size: 120%;
+  width: 30%;
+  outline: none;
+}
+
+option {
+  text-align: center;
+}
+

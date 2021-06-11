@@ -128,6 +128,10 @@ def groups():
 def main():
   return render_template("main.html")
 
+@app.route("/layout")
+def layout():
+  return render_template("layout.html")
+
 @app.errorhandler(Unauthorized)
 def redirect_unauthorized(e):
     return render_template("main.html")
