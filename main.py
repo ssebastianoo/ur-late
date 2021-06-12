@@ -3,6 +3,15 @@ from replit import db
 from flask import Flask, redirect, url_for, render_template, request, Response
 from flask_discord import DiscordOAuth2Session, requires_authorization, Unauthorized
 
+print(db["groups"])
+
+class Group:
+  def __init__(self, id, name, members, access):
+    self.id = id
+    self.name = name
+    self.members = members
+    self.access = access
+
 if not db.get("groups"):
   db["groups"] = dict()
 
@@ -35,9 +44,17 @@ def index():
         g: db["groups"][g]
         for g in db["groups"] if user.id in db["groups"][g]["access"]
     }
+
+    group_number = request.args.get("group")
+    group_number = group_number or 0
     if len(groups) == 0:
         groups = None
-    return render_template("index.html", groups=groups)
+
+    values = [x for x in groups.keys()]
+    dict_group = groups[values[group_number]]
+    group = Group(id=values[group_number], name=dict_group["name"], access=dict_group["access"], members=dict_group["members"])
+
+    return render_template("index.html", group=group, groups=groups)
 
 @app.route("/api/v1/groups/create/", methods=["POST"])
 def create_group():
