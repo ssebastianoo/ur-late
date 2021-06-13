@@ -3,8 +3,6 @@ from replit import db
 from flask import Flask, redirect, url_for, render_template, request, Response
 from flask_discord import DiscordOAuth2Session, requires_authorization, Unauthorized
 
-print(db["groups"])
-
 class Group:
   def __init__(self, id, name, members, access):
     self.id = id
